@@ -19,7 +19,8 @@ import {
     Form,
     Input,
     FormFeedback,
-    Label, Button
+    Label, Button, TabContent,
+    TabPane, CardText, Nav, NavItem, NavLink
 } from "reactstrap";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -36,10 +37,13 @@ import "react-table-6/react-table.css";
 import { getListMovie, getMovieById, createMovie, updateMovie, deleteMovie } from "helpers/app-backend/movie-backend-helper";
 import { getListCategory, getCategoryById, createCategory, updateCategory, deleteCategory } from "helpers/app-backend/category-backend-helper";
 import { getListCelebrity, getCelebrityById, createCelebrity, updateCelebrity, deleteCelebrity } from "helpers/app-backend/celebrity-backend-helper";
-
+import TVEpisodeTable from "LKAdminPage/TVSeries/TVEpisodeTable";
 import { Cell } from "recharts";
 import Switch from 'react-switch'
 import Select from 'react-select'
+import ReactLoading from 'react-loading';
+import classnames from "classnames";
+import { getListTVEpisode, getTVEpisodeById, createTVEpisode, updateTVEpisode, deleteTVEpisode } from "helpers/app-backend/tvepisode-backend-helper";
 
 //redux
 
@@ -65,6 +69,13 @@ const MovieTable = () => {
     const [defaultActor, setDefaultActor] = useState([])
     const [defaultDirector, setDefaultDirector] = useState([])
     const [modalMovie, setModalMovie] = useState([false])
+    const [defaultMovie, setDefaultMovie] = useState({})
+    const [MovieVideo, setMovieVideo] = useState(null)
+    const [type, setType] = useState("")
+    const [activeTab1, setactiveTab1] = useState("1");
+    const [listEpisode, setListEpisode] = useState([])
+    const [isLoading, setIsloading] = useState(false)
+    const [movieId,setMovieId] = useState()
     const optionType = [
         {
             label: "Phim lẻ",
@@ -137,6 +148,11 @@ const MovieTable = () => {
             width: 150,
         },
         {
+            Header: "Status",
+            accessor: "Status",
+            width: 150,
+        },
+        {
             Header: "Action",
             width: 200,
             id: "action",
@@ -171,6 +187,25 @@ const MovieTable = () => {
         }
     ]
 
+
+    const getListEpisode = async (id) => {
+        await getListTVEpisode(id).then(response => {
+            if (response.isSuccess) {
+                setListEpisode(response.data)
+                setModal(true)
+            }
+        })
+    }
+
+    const onVideoChange = (e) => {
+        let reader = new FileReader();
+        let selectedFile = e.target.files[0];
+
+        reader.readAsDataURL(selectedFile);
+        reader.onload = (readerEvent) => {
+            setMovieVideo(readerEvent.target.result);
+        };
+    }
 
 
     const getListDataHandler = async () => {
@@ -239,11 +274,15 @@ const MovieTable = () => {
                         itemDirector = {}
                     })
                 }
-                setDataEdit(res.data)
-                setDefaultCategory(arrCat)
-                setDefaultActor(arrActor)
-                setDefaultDirector(arrDirector)
-                setModal(true)
+                getListEpisode(id).then(() => {
+                    setDataEdit(res.data)
+                    setDefaultCategory(arrCat)
+                    setDefaultActor(arrActor)
+                    setDefaultDirector(arrDirector)
+                    setModal(true)
+                }
+                )
+
             }
         })
     }
@@ -279,7 +318,9 @@ const MovieTable = () => {
         setChecked(false)
         setDataEdit({})
         setImageClient(null)
-
+        setDefaultCategory([])
+        setDefaultActor([])
+        setDefaultDirector([])
     }
 
     const handleSubmit = (e) => {
@@ -314,17 +355,52 @@ const MovieTable = () => {
                 Director.push(item.value)
             })
         }
-
+        console.log(e.target["Type"].value)
         const Movie = {
             MovieName: e.target["MovieName"].value,
             Category: Category,
             Actor: Actor,
             Director: Director,
             Type: e.target["Type"].value,
-            Country: e.target["Country"].value
+            Country: e.target["Country"].value,
+            RunTime: type == "SingleMovie" ? e.target["RunTime"].value : "",
+            Rating: e.target["Rating"].value,
+            RateCount: e.target["RateCount"].value,
+            ViewCount: e.target["ViewCount"].value,
+            YearProduce: e.target["YearProduce"].value,
+            Status: e.target["Status"].value,
+            IsTrending: e.target["IsTrending"].value,
+            Poster: e.target["MoviePoster"].files[0],
+            CoverPoster: e.target["MovieCoverPoster"].files[0],
+            Trailer: e.target["MovieTrailer"].value,
+            Video: type == "SingleMovie" ? e.target["MovieVideo"].files[0] : undefined,
+            Description: e.target["Description"].value,
+            Season: type == "TVSeries" ? e.target["Season"].value : 0
         }
+
+        const formData = new FormData();
+        formData.append('MovieName', Movie.MovieName);
+        formData.append("Category", JSON.stringify(Movie.Category));
+        formData.append("Actor", JSON.stringify(Movie.Actor))
+        formData.append("Director", JSON.stringify(Movie.Director))
+        formData.append("Type", Movie.Type)
+        formData.append("Country", Movie.Country)
+        formData.append('RunTime', Movie.RunTime)
+        formData.append('Rating', Movie.Rating);
+        formData.append("RateCount", Movie.RateCount)
+        formData.append('ViewCount', Movie.ViewCount);
+        formData.append('YearProduce', Movie.YearProduce);
+        formData.append('Status', Movie.Status)
+        formData.append('IsTrending', Movie.IsTrending);
+        formData.append("MoviePoster", Movie.Poster)
+        formData.append("MovieCoverPoster", Movie.CoverPoster)
+        formData.append('Trailer', Movie.Trailer);
+        formData.append('MovieVideo', Movie.Video);
+        formData.append('Description', Movie.Description)
+        formData.append('Season', Movie.Season)
+
         if (isEdit) {
-            updateMovie(MovieId, Movie).then(res => {
+            updateMovie(MovieId, formData).then(res => {
                 if (res.isSuccess) {
                     getListDataHandler()
                     setModal(false)
@@ -333,18 +409,34 @@ const MovieTable = () => {
             })
         }
         else {
-            createMovie(Movie).then(res => {
+            createMovie(formData).then(res => {
                 if (res.isSuccess) {
                     getListDataHandler()
-                    setModal(false)
+                    if(type=="SingleMovie"){
+                        setModal(false)
+                    }
+                    setMovieId(res.data)
                 }
             })
         }
+        setDefaultCategory([])
+        setDefaultActor([])
+        setDefaultDirector([])
+
     }
     const onImageChange = (event) => {
         setImageClient(URL.createObjectURL(event.target.files[0]))
     }
 
+    const getType = (event) => {
+        setType(event.value)
+    }
+    const toggle1 = tab => {
+        console.log(tab)
+        if (activeTab1 !== tab) {
+            setactiveTab1(tab);
+        }
+    };
     return (
         <React.Fragment>
             <DeleteModal
@@ -356,138 +448,313 @@ const MovieTable = () => {
                 <Container fluid>
                     <Breadcrumbs title="Projects" breadcrumbItem="User Management" />
                     <Button onClick={onClickCreate}>Thêm mới</Button>
-                    {dataList.length > 0 ?
-                        <Row>
-                            <Col lg="12">
-                                <div >
-                                    <div className="table-responsive">
+                    <Row>
+                        <Col lg="12">
+                            <div >
+                                <div className="table-responsive">
+                                    {dataList.length > 0 ?
+
                                         <ReactTable
                                             data={dataList}
                                             columns={columns}
                                             defaultPageSize={10}
                                         />
-                                        <Modal isOpen={modal} toggle={toggle}>
-                                            <ModalHeader toggle={toggle} tag="h4">
-                                                {!!isEdit ? "Edit Project" : "Add Project"}
-                                            </ModalHeader>
-                                            <ModalBody>
-                                                <Form
+                                        :
+                                        <Row>
+                                            <Col xs="12">
+                                                <div className="text-center my-3">
+                                                    <Link to="#" className="text-success">
+                                                        <i className="bx bx-loader bx-spin font-size-18 align-middle me-2" />
+                                                        Load more
+                                                    </Link>
+                                                </div>
+                                            </Col>
+                                        </Row>}
+                                    <Modal isOpen={modal} toggle={toggle} size="lg" style={{ maxWidth: '1600px', width: '100%', maxHeight: '600px' }}>
+                                        <ModalHeader toggle={toggle} tag="h4">
+                                            {!!isEdit ? "Edit Project" : "Add Project"}
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            <Nav pills className="navtab-bg nav-justified">
+                                                <NavItem>
+                                                    <NavLink
+                                                        style={{ cursor: "pointer" }}
+                                                        className={classnames({
+                                                            active: activeTab1 === "1",
+                                                        })}
+                                                        onClick={() => {
+                                                            toggle1("1")
+                                                        }}
+                                                    >
+                                                        Season
+                                                    </NavLink>
+                                                </NavItem>
+                                                {type == "TVSeries" ?
+                                                    <NavItem>
+                                                        <NavLink
+                                                            style={{ cursor: "pointer" }}
+                                                            className={classnames({
+                                                                active: activeTab1 === "2",
+                                                            })}
+                                                            onClick={() => {
+                                                                toggle1("2")
+                                                            }}
+                                                        >
+                                                            Episode
+                                                        </NavLink>
+                                                    </NavItem> : <></>
+                                                }
+                                            </Nav>
+                                            <TabContent
+                                                activeTab={activeTab1} className="pt-3 px-4 text-muted">
+                                                <TabPane tabId="1">
+                                                    <Form
 
-                                                    onSubmit={(e) => {
-                                                        e.preventDefault();
-                                                        handleSubmit(e);
-                                                        return false;
-                                                    }}
-                                                >
-                                                    <Row form>
-                                                        <Col xs={12}>
-                                                            <div className="mb-3">
-                                                                <Input
-                                                                    name="Id"
-                                                                    type="hidden"
-                                                                    defaultValue={dataEdit?._id || ""}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">MovieName</Label>
-                                                                <Input
-                                                                    name="MovieName"
-                                                                    type="text"
-                                                                    defaultValue={dataEdit?.MovieName || ""}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">Category</Label>
-                                                                <Select
-                                                                    name={"Category"}
-                                                                    closeMenuOnSelect={false}
-                                                                    defaultValue={
-                                                                        defaultCategory
-                                                                    }
-                                                                    isMulti
-                                                                    options={dataCategory}
-                                                                />
-                                                            </div>
+                                                        onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            handleSubmit(e);
+                                                            return false;
+                                                        }}
+                                                    >
+                                                        <Row form>
+                                                            <Col xs={12}>
+                                                                <div className="mb-3">
+                                                                    <Input
+                                                                        name="Id"
+                                                                        type="hidden"
+                                                                        defaultValue={dataEdit?._id || ""}
+                                                                    />
+                                                                </div>
+                                                                <Row>
+                                                                    <Col xs={3}>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">MovieName</Label>
+                                                                            <Input
+                                                                                name="MovieName"
+                                                                                type="text"
+                                                                                defaultValue={dataEdit?.MovieName || ""}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Category</Label>
+                                                                            <Select
+                                                                                name={"Category"}
+                                                                                closeMenuOnSelect={false}
+                                                                                defaultValue={
+                                                                                    defaultCategory
+                                                                                }
+                                                                                isMulti
+                                                                                options={dataCategory}
+                                                                            />
+                                                                        </div>
 
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">Actor</Label>
-                                                                <Select
-                                                                    name={"Actor"}
-                                                                    closeMenuOnSelect={false}
-                                                                    defaultValue={
-                                                                        defaultActor
-                                                                    }
-                                                                    isMulti
-                                                                    options={dataCeleb}
-                                                                />
-                                                            </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Actor</Label>
+                                                                            <Select
+                                                                                name={"Actor"}
+                                                                                closeMenuOnSelect={false}
+                                                                                defaultValue={
+                                                                                    defaultActor
+                                                                                }
+                                                                                isMulti
+                                                                                options={dataCeleb}
+                                                                            />
+                                                                        </div>
 
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">Director</Label>
-                                                                <Select
-                                                                    name={"Director"}
-                                                                    closeMenuOnSelect={false}
-                                                                    defaultValue={
-                                                                        defaultDirector
-                                                                    }
-                                                                    isMulti
-                                                                    options={dataCeleb}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">Type</Label>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Director</Label>
+                                                                            <Select
+                                                                                name={"Director"}
+                                                                                closeMenuOnSelect={false}
+                                                                                defaultValue={
+                                                                                    defaultDirector
+                                                                                }
+                                                                                isMulti
+                                                                                options={dataCeleb}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Type</Label>
 
-                                                                <Select
-                                                                    name={"Type"}
-                                                                    closeMenuOnSelect={false}
-                                                                    defaultValue={
-                                                                        optionType.filter(el => el.value == dataEdit?.Type)
-                                                                    }
-                                                                    options={optionType}
-                                                                />
-                                                            </div>
+                                                                            <Select
+                                                                                name={"Type"}
+                                                                                closeMenuOnSelect={true}
+                                                                                defaultValue={
+                                                                                    optionType.filter(el => el.value == dataEdit?.Type)
+                                                                                }
+                                                                                onChange={getType}
+                                                                                options={optionType}
+                                                                                // isDisabled={isEdit}
+                                                                            />
+                                                                        </div>
+                                                                    </Col>
+                                                                    <Col xs={3}>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Country</Label>
 
-                                                            <div className="mb-3">
-                                                                <Label className="form-label">Country</Label>
+                                                                            <Input
+                                                                                name="Country"
+                                                                                type="text"
+                                                                                defaultValue={dataEdit?.Country || ""}
+                                                                            />
+                                                                        </div>
 
-                                                                <Input
-                                                                    name="Country"
-                                                                    type="text"
-                                                                    defaultValue={dataEdit?.Country || ""}
-                                                                />
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col>
-                                                            <div className="text-end">
-                                                                <button
-                                                                    type="submit"
-                                                                    className="btn btn-success save-user"
-                                                                >
-                                                                    Save
-                                                                </button>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-                                                </Form>
-                                            </ModalBody>
-                                        </Modal>
-                                    </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Rating</Label>
+                                                                            <Input
+                                                                                name="Rating"
+                                                                                type="number"
+                                                                                defaultValue={dataEdit?.Rating || 0}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">RateCount</Label>
+                                                                            <Input
+                                                                                name="RateCount"
+                                                                                type="number"
+                                                                                defaultValue={dataEdit?.RateCount || 0}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">ViewCount</Label>
+                                                                            <Input
+                                                                                name="ViewCount"
+                                                                                type="number"
+                                                                                defaultValue={dataEdit?.ViewCount || 0}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">YearProduce</Label>
+                                                                            <Input
+                                                                                name="YearProduce"
+                                                                                type="number"
+                                                                                defaultValue={dataEdit?.YearProduce || 0}
+                                                                            />
+                                                                        </div>
+                                                                    </Col>
+                                                                    <Col xs={3}>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Status</Label>
+                                                                            <Input
+                                                                                name="Status"
+                                                                                type="text"
+                                                                                defaultValue={dataEdit?.Status || 0}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">IsTrending</Label>
+                                                                            <Input
+                                                                                name="IsTrending"
+                                                                                type="text"
+                                                                                defaultValue={dataEdit?.IsTrending || 0}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Cover Poster</Label>
+                                                                            <Input
+                                                                                name="MovieCoverPoster"
+                                                                                type="file"
+                                                                            // defaultValue={dataEdit?.Poster || ""}
+                                                                            // onChange={onImageChange}
+                                                                            />
+                                                                        </div>
+
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Poster</Label>
+                                                                            <Input
+                                                                                name="MoviePoster"
+                                                                                type="file"
+                                                                                // defaultValue={dataEdit?.Poster || ""}
+                                                                                onChange={onImageChange}
+                                                                            />
+                                                                        </div>
+
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Trailer</Label>
+                                                                            <Input
+                                                                                name="MovieTrailer"
+                                                                                type="text"
+                                                                                defaultValue={dataEdit?.Trailer || ""}
+                                                                            />
+                                                                        </div>
+
+                                                                    </Col>
+                                                                    <Col xs={3}>
+                                                                        <div className="mb-3">
+                                                                            <Label className="form-label">Description</Label>
+                                                                            <Input
+                                                                                name="Description"
+                                                                                type="textarea"
+                                                                                defaultValue={dataEdit?.Description || ""}
+                                                                            />
+                                                                        </div>
+                                                                        {
+                                                                            type == "SingleMovie" ?
+                                                                                <div>
+                                                                                    <div className="mb-3">
+                                                                                        <Label className="form-label">Video</Label>
+                                                                                        <Input
+                                                                                            name="MovieVideo"
+                                                                                            type="file"
+                                                                                            // defaultValue={dataEdit?.Video || ""}
+                                                                                            onChange={onVideoChange}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="mb-3">
+                                                                                        <Label className="form-label">RunTime</Label>
+                                                                                        <Input
+                                                                                            name="RunTime"
+                                                                                            type="text"
+                                                                                            defaultValue={dataEdit?.RunTime || ""}
+                                                                                        />
+                                                                                    </div>
+                                                                                </div> : type == "TVSeries" ?
+                                                                                    <div className="mb-3">
+                                                                                        <Label className="form-label">Season</Label>
+                                                                                        <Input
+                                                                                            name="Season"
+                                                                                            type="number"
+                                                                                            defaultValue={dataEdit?.Season || 0}
+                                                                                        />
+                                                                                    </div> : <></>
+                                                                        }
+                                                                    </Col>
+                                                                </Row>
+
+
+                                                            </Col>
+                                                        </Row>
+                                                        <Row>
+                                                            <Col>
+                                                                <div className="text-end">
+                                                                    <button
+                                                                        type="submit"
+                                                                        className="btn btn-success save-user"
+                                                                    >
+                                                                        Save
+                                                                    </button>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
+                                                    </Form>
+                                                </TabPane>
+                                                <TabPane tabId="2">
+                                                    <TVEpisodeTable
+                                                        data={listEpisode}
+                                                        movie={dataEdit?._id || movieId}
+                                                        getListData={getListEpisode}
+                                                        setIsLoading={setIsloading}
+                                                    />
+                                                </TabPane>
+                                            </TabContent>
+
+                                        </ModalBody>
+                                    </Modal>
                                 </div>
-                            </Col>
-                        </Row>
-                        :
-                        <Row>
-                            <Col xs="12">
-                                <div className="text-center my-3">
-                                    <Link to="#" className="text-success">
-                                        <i className="bx bx-loader bx-spin font-size-18 align-middle me-2" />
-                                        Load more
-                                    </Link>
-                                </div>
-                            </Col>
-                        </Row>}
+                            </div>
+                        </Col>
+                    </Row>
+
                 </Container>
             </div>
         </React.Fragment>

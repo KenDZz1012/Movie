@@ -10,7 +10,6 @@ export default class MovieFilter {
     @IsOptional()
     public Category: Array<string>
 
-
     @IsArray()
     @IsOptional()
     public Director: Array<string>
@@ -26,6 +25,58 @@ export default class MovieFilter {
     @IsString()
     @IsOptional()
     public Type: string
+
+    @IsString()
+    @IsOptional()
+    public Poster: string
+
+    @IsString()
+    @IsOptional()
+    public CoverPoster: string
+
+    @IsString()
+    @IsOptional()
+    public Description: string
+
+    @IsString()
+    @IsOptional()
+    public RunTime: string
+
+    @IsNumber()
+    @IsOptional()
+    public Rating: number
+
+    @IsNumber()
+    @IsOptional()
+    public RateCount: number
+
+    @IsNumber()
+    @IsOptional()
+    public ViewCount: number
+
+    @IsNumber()
+    @IsOptional()
+    public YearProduce: number
+
+    @IsString()
+    @IsOptional()
+    public Trailer: string
+
+    @IsString()
+    @IsOptional()
+    public Video: string
+
+    @IsBoolean()
+    @IsOptional()
+    public IsTrending: boolean
+
+    @IsString()
+    @IsOptional()
+    public Status: string
+
+    @IsNumber()
+    @IsOptional()
+    public Season: number
 
     @IsDate()
     @IsOptional()

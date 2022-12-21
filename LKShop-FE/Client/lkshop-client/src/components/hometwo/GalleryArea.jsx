@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Slider from "react-slick";
 import { getListSingleMovie } from '../../helpers/app-backend/singlemovie-backend-helper';
-
+import { getListMovie } from '../../helpers/app-backend/movie-backend-helper'
 
 function PrevArrow(props) {
   const { className, onClick } = props;
@@ -21,7 +21,7 @@ const GalleryArea = () => {
 
 
   const getListSingleMovieTrending = async () => {
-    await getListSingleMovie({ status: "UpComing" }).then(res => {
+    await getListMovie({ status: "UpComing" }).then(res => {
       if (res?.isSuccess) {
         setMovieSidebar(res.data)
         console.log(res.data)

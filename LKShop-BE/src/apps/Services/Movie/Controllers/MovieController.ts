@@ -10,6 +10,8 @@ import MovieFilter from "../DTO/MovieFilter";
 import MovieCreate from "../DTO/MovieCreate";
 import MovieUpdate from "../DTO/MovieUpdate";
 import HttpException from "../../../../Exceptions/HttpException";
+import * as fs from 'fs';
+import Pageable from "../DTO/Pageable";
 
 const baseUrl = "api/v1/Movie"
 
@@ -21,7 +23,9 @@ export class MovieController {
     })
     private async GetAllMovie(req: Request, res: Response, next: NextFunction) {
         try {
-            const movies = await getAllMovieHandler(req.body);
+            const filter = req.query as unknown as MovieFilter
+            const pageable = req.query as unknown as Pageable
+            const movies = await getAllMovieHandler(filter,pageable);
             return res.status(200).send(new BaseResponse<Movie[]>(movies, "Get Success", true))
         }
         catch (error) {
@@ -47,17 +51,67 @@ export class MovieController {
     }
 
     @Router({
+        path: `/${baseUrl}/GetVideo/Folder=:Folder&Movie=:Movie&YearProduce=:YearProduce`,
+        method: 'get',
+    })
+    private async GetVideoByMovie(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { Folder, Movie, YearProduce } = req.params
+            const path = `src/public/${Folder}/${Movie}-${YearProduce}.mp4`;
+            console.log(path)
+            const stat = fs.statSync(path);
+            console.log(stat)
+            const fileSize = stat.size;
+            const range = req.headers.range;
+            if (range) {
+                const parts = range.replace(/bytes=/, "").split("-");
+                const start = parseInt(parts[0], 10);
+                const end = parts[1]
+                    ? parseInt(parts[1], 10)
+                    : fileSize - 1;
+                const chunksize = (end - start) + 1;
+                const file = fs.createReadStream(path, { start, end });
+                const head = {
+                    'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunksize,
+                    'Content-Type': 'video/mp4',
+                };
+                console.log(path)
+                res.writeHead(206, head);
+                file.pipe(res);
+            } else {
+                const head = {
+                    'Content-Length': fileSize,
+                    'Content-Type': 'video/mp4',
+                };
+                console.log('path', path)
+                res.writeHead(200, head);
+                fs.createReadStream(path).pipe(res);
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    @Router({
         path: `/${baseUrl}/CreateMovie`,
         method: 'post',
-        middlewares: [extractJWT, validationMiddleware(MovieCreate)]
+        middlewares: [extractJWT, validationMiddleware(MovieCreate), upload.fields([
+            { name: "MoviePoster" },
+            { name: "MovieVideo" },
+            { name: "MovieCoverPoster" }
+        ])]
     })
     private async CreateMovie(req: Request, res: Response, next: NextFunction) {
-        const response = await createMovieHandler(req.body);
+        const response = await createMovieHandler(req.body, req.files);
         if (!response) {
             return next(new HttpException(400, response.msgString))
         }
         else {
             return res.status(201).send({
+                data: response.data,
                 isSuccess: response.isSuccess,
                 message: response.msgString
             })
@@ -67,11 +121,15 @@ export class MovieController {
     @Router({
         path: `/${baseUrl}/UpdateMovie/:MovieId`,
         method: 'put',
-        middlewares: [extractJWT, validationMiddleware(MovieUpdate)]
+        middlewares: [extractJWT, validationMiddleware(MovieUpdate), upload.fields([
+            { name: "MoviePoster" },
+            { name: "MovieVideo" },
+            { name: "MovieCoverPoster" }
+        ])]
     })
     private async UpdateMovie(req: Request, res: Response, next: NextFunction) {
         const { MovieId } = req.params
-        const Movie = await updateMovieHandler(MovieId, req.body)
+        const Movie = await updateMovieHandler(MovieId, req.body, req.files)
         return res.status(200).send({
             isSuccess: true,
             msgString: "Update Success"

@@ -13,7 +13,7 @@ const PricingArea = () => {
 
   useEffect(() => {
     fetchListBundle()
-  })
+  },[])
 
   return (
     <section className="pricing-area pricing-bg" style={{ backgroundImage: 'url("img/bg/pricing_bg.jpg")' }}>

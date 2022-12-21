@@ -4,13 +4,13 @@ import $ from "jquery";
 import { getListSingleMovie } from '../../helpers/app-backend/singlemovie-backend-helper';
 import { getListTVSeason } from '../../helpers/app-backend/tvseason-backend-helper'
 import { Link, useHistory } from "react-router-dom";
+import { getListMovie } from '../../helpers/app-backend/movie-backend-helper'
 
 const TopRatedMovies2 = () => {
 
   const [newMovie, setNewMovie] = useState([])
-  const [tvSeason, setTvSeason] = useState([])
   const getListNewSingleMovie = async () => {
-    await getListSingleMovie({ size: 5, sort: "-CreatedTime", Status: "Done" }).then(res => {
+    await getListMovie({ size: 10, sort: "-CreatedTime", Status: "Done" }).then(res => {
       if (res?.isSuccess) {
         setNewMovie(res.data)
         $('.popup-video').magnificPopup({
@@ -20,20 +20,10 @@ const TopRatedMovies2 = () => {
     })
   }
 
-  const getListTV = async () => {
-    await getListTVSeason({ size: 5, sort: "-CreatedTime", Status: "Done" }).then(res => {
-      if (res?.isSuccess) {
-        setTvSeason(res.data)
-        $('.popup-video').magnificPopup({
-          type: 'iframe'
-        });
-      }
-    })
-  }
+
   useEffect(() => {
 
     getListNewSingleMovie()
-    getListTV()
   }, [])
 
 
@@ -69,9 +59,9 @@ const TopRatedMovies2 = () => {
                     <i className="fas fa-star" />
                     <i className="fas fa-star" />
                   </div>
-                  <h5 className="title"><Link to={`/movie-details-${item._id}`} target="_blank">{item.Movie.MovieName}</Link></h5>
-                  {item.Movie.Category.length > 0 ?
-                    item.Movie.Category.map((item, index) => {
+                  <h5 className="title"><Link to={`/movie-details-${item._id}`} target="_blank">{item.MovieName}</Link></h5>
+                  {item.Category.length > 0 ?
+                    item.Category.map((item, index) => {
                       if (index < 2) {
                         return (<span className="rel"> {item.CategoryName}</span>)
                       }
@@ -81,7 +71,7 @@ const TopRatedMovies2 = () => {
                     <ul>
                       <li className="tag" style={{ display: 'flex', marginRight: 0 }}>
                         <a href="/#">HD</a>
-                        <a href="/#">{item.Movie.Country}</a>
+                        <a href="/#">{item.Country}</a>
                       </li>
                       <li>
                         <span className="like"><i className="fas fa-thumbs-up" /> {item.Rating}</span>
@@ -93,47 +83,7 @@ const TopRatedMovies2 = () => {
             </div>
           ))}
 
-          {tvSeason.map(item => (
-            <div className="custom-col-">
-              <div className="movie-item movie-item-two">
-                <div className="movie-poster">
-                  <img src={item.Poster} alt="" height={273} />
-                  <ul className="overlay-btn">
-                    <li><a href={item.Trailer} className="popup-video btn">Trailer</a></li>
-                    <li><Link to={`/movie-details-${item._id}`} target="_blank" className='btn'>Watch Now</Link></li>
-                  </ul>
-                </div>
-                <div className="movie-content">
-                  <div className="rating">
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                  </div>
-                  <h5 className="title"><Link to={`/movie-details-${item._id}`} target="_blank">{item.Movie.MovieName}</Link></h5>
-                  {item.Movie.Category.length > 0 ?
-                    item.Movie.Category.map((item, index) => {
-                      if (index < 2) {
-                        return (<span className="rel"> {item.CategoryName}</span>)
-                      }
-                    }) :
-                    <></>}
-                  <div className="movie-content-bottom">
-                    <ul>
-                      <li className="tag" style={{ display: 'flex', marginRight: 0 }}>
-                        <a href="/#">HD</a>
-                        <a href="/#">{item.Movie.Country}</a>
-                      </li>
-                      <li>
-                        <span className="like"><i className="fas fa-thumbs-up" /> {item.Rating}</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        
 
         </div>
       </div>

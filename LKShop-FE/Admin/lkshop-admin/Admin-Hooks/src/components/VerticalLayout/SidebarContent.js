@@ -147,7 +147,7 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-            <li>
+            {/* <li>
               <Link to="/SingleMovie" >
                 <i className="bx bx-movie"></i>
                 <span>{props.t("SingleMovie")}</span>
@@ -160,7 +160,7 @@ const SidebarContent = props => {
                 <i className="bx bx-tv"></i>
                 <span>{props.t("TV Series")}</span>
               </Link>
-            </li>
+            </li> */}
 
             
 

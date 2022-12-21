@@ -4,12 +4,15 @@ import "magnific-popup";
 import $ from "jquery";
 import 'animate.css';
 import { getListSingleMovie } from '../../helpers/app-backend/singlemovie-backend-helper';
+import { Link, useHistory } from "react-router-dom";
+import { getListMovie } from '../../helpers/app-backend/movie-backend-helper'
+
 const SliderArea = () => {
   const [movieSidebar, setMovieSidebar] = useState([])
 
 
   const getListSingleMovieTrending = async () => {
-    await getListSingleMovie({ IsTrending: true, Status: "Done" }).then(res => {
+    await getListMovie({ IsTrending: true, Status: "Done" }).then(res => {
       if (res?.isSuccess) {
         setMovieSidebar(res.data)
         console.log(res.data)
@@ -132,7 +135,7 @@ const SliderArea = () => {
 
                       <h6 className="sub-title" data-delay=".2s">Movie</h6>
 
-                      <h2 className="title animate__animated animate__fadeInUp" data-delay=".4s">{item.Movie.MovieName}</h2>
+                      <h2 className="title animate__animated animate__fadeInUp" data-delay=".4s">{item.MovieName}</h2>
 
 
                       <div className="banner-meta animate__animated animate__fadeInUp" data-delay=".6s">
@@ -143,8 +146,8 @@ const SliderArea = () => {
                           </li>
                           <li className="category">
 
-                            {item.Movie.Category.length > 0 ?
-                              item.Movie.Category.map((item, index) => {
+                            {item.Category.length > 0 ?
+                              item.Category.map((item, index) => {
                                 if (index < 2) {
                                   return (<a href="/#" style={{ padding: 2, border: "1px solid #ccc" }}>{item.CategoryName}</a>)
                                 }
@@ -160,7 +163,7 @@ const SliderArea = () => {
                       </div>
 
 
-                      <a href="#" className="banner-btn btn"><i className="fas fa-play" /> Watch Now</a>
+                      <Link to={`/movie-details-${item._id}`} className='btn' target="_blank"><i className="fas fa-play" /> Watch Now</Link>
 
                       <a href="https://www.youtube.com/watch?v=8ugaeA-nMTc?autoplay=1" className="banner-btn btn popup-video" data-delay=".1s"><i className="fas fa-play" /> Trailer</a>
 

@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import $ from "jquery";
+import { useHistory } from "react-router-dom";
 
 
 const HeaderTwo = () => {
+  const history = useHistory()
+  const [search, setSearch] = useState("")
   useEffect(() => {
 
 
@@ -68,6 +71,12 @@ const HeaderTwo = () => {
     }
 
   }, [])
+
+  const gotoSearch = () => {
+    history.push(`/search-${search}`)
+  }
+
+
   return (
     <header className="header-style-two">
       <div className="header-top-wrap">
@@ -129,9 +138,9 @@ const HeaderTwo = () => {
                     <ul>
                       <li className="d-none d-xl-block">
                         <div className="footer-search">
-                          <form action="#">
-                            <input type="text" placeholder="Find Favorite Movie" />
-                            <button><i className="fas fa-search" /></button>
+                          <form>
+                            <input type="text" placeholder="Find Favorite Movie" onChange={(e) => { setSearch(e.target.value) }} />
+                            <button type='submit' onClick={gotoSearch}><i className="fas fa-search" /></button>
                           </form>
                         </div>
                       </li>

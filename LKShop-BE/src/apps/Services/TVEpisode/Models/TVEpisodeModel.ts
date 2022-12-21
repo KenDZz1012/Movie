@@ -23,9 +23,9 @@ const TVEpisodeSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    TVSeason: {
+    Movie: {
         type: mongoose.Types.ObjectId,
-        ref: "tbl_TVSeason"
+        ref: "tbl_Movie"
     },
     CreatedTime: {
         type: Date,

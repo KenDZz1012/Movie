@@ -45,13 +45,13 @@ export class TVEpisodeController {
     }
 
     @Router({
-        path: `/${baseUrl}/GetVideo/Folder=:Folder&Season=:Season&Episode=:Episode`,
+        path: `/${baseUrl}/GetVideo/Folder=:Folder&Movie=:Movie&Episode=:Episode`,
         method: 'get',
     })
     private async GetVideoByMovie(req: Request, res: Response, next: NextFunction) {
         try {
-            const { Folder, Season, Episode } = req.params
-            const path = `src/public/${Folder}/${Season}-${Episode}.mp4`;
+            const { Folder, Movie, Episode } = req.params
+            const path = `src/public/${Folder}/${Movie}-${Episode}.mp4`;
             console.log(path)
             const stat = fs.statSync(path);
             console.log(stat)

@@ -11,7 +11,7 @@ import Blogs from './pages/Blogs';
 import BlogDetails from './pages/BlogDetails';
 import ContactPage from './pages/ContactPage';
 import SigninPage from './pages/SignIn'
-
+import Search from './pages/Search'
 function App() {
 
 
@@ -47,8 +47,11 @@ function App() {
           <Route exact={true} path="/movie">
             <Movie />
           </Route>
-          <Route exact={true} path="/movie-details-:movieId" component={MovieDetails}/>
-            {/* < />
+
+          <Route exact={true} path="/search-:movieName" component={Search} />
+
+          <Route exact={true} path="/movie-details-:movieId" component={MovieDetails} />
+          {/* < />
 
           </Route> */}
           <Route exact={true} path="/tv-show">

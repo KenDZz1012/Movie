@@ -27,6 +27,6 @@ export default class TVEpisodeUpdate {
 
     @IsString()
     @IsOptional()
-    public TVSeason: string
+    public Movie: string
 }
 

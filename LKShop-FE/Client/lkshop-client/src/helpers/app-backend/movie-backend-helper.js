@@ -1,9 +1,18 @@
 import { get, post, put, del, postWithFormData, putWithFormData } from '../api_helper'
+import { spreadSearchQuery } from '../utilities'
 
 const BASE_API_URL = `${process.env.REACT_APP_MOVIE_ENDPOINT}`
-
+const BASE_SITE_API_URL = `${process.env.REACT_APP_SITE_ENDPOINT}`
 const getListMovie = filter => {
-    return get(`${BASE_API_URL}/GetAllMovie`, filter)
+    let q = spreadSearchQuery(filter)
+    console.log(q)
+    return get(`${BASE_API_URL}/GetAllMovie/?${q}`)
+}
+
+const searchMovie = filter => {
+    let q = spreadSearchQuery(filter)
+    console.log(process.env.REACT_APP_SITE_ENDPOINT)
+    return get(`${BASE_SITE_API_URL}/GetMovieByMovieName/?${q}`)
 }
 
 const getMovieById = id => {
@@ -18,7 +27,7 @@ const updateMovie = (UserId, userUpdate) => {
     return put(`${BASE_API_URL}/UpdateMovie/${UserId}`, userUpdate)
 }
 
-const deleteMovie= id => {
+const deleteMovie = id => {
     return del(`${BASE_API_URL}/DeleteMovie/${id}`)
 }
 export {
@@ -26,5 +35,6 @@ export {
     getMovieById,
     createMovie,
     updateMovie,
-    deleteMovie
+    deleteMovie,
+    searchMovie
 }

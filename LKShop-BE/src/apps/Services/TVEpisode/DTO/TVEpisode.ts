@@ -5,7 +5,7 @@ export default class TVEpisode {
     public Video: string
     public VideoUrl: string
     public RunTime: string
-    public TVSeason: string
+    public Movie: string
     public CreatedTime: Date
 }
 

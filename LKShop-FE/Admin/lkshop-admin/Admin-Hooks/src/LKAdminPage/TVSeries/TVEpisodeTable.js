@@ -22,7 +22,7 @@ import {
 } from "reactstrap";
 import { getListTVEpisode, getTVEpisodeById, createTVEpisode, updateTVEpisode, deleteTVEpisode } from "helpers/app-backend/tvepisode-backend-helper";
 
-export default function TVEpisodeTable({ data, season, getListData, setIsLoading }) {
+export default function TVEpisodeTable({ data, movie, getListData, setIsLoading }) {
     const [isHover, setIsHover] = useState(null)
     const [isEdit, setIsEdit] = useState(false)
     const [dataEdit, setDataEdit] = useState()
@@ -55,14 +55,14 @@ export default function TVEpisodeTable({ data, season, getListData, setIsLoading
         setIsLoading(true)
         const episodeId = e.target["Id"].value
         const singleMovie = {
-            TVSeason: season,
+            Movie: movie,
             RunTime: e.target["RunTime"].value,
             Episode: e.target["Episode"].value,
             EpisodeName: e.target["EpisodeName"].value,
             Video: e.target["MovieVideo"].files[0],
         }
         const formData = new FormData();
-        formData.append('TVSeason', singleMovie.TVSeason);
+        formData.append('Movie', singleMovie.Movie);
         formData.append('RunTime', singleMovie.RunTime);
         formData.append("Episode", singleMovie.Episode);
         formData.append("EpisodeName", singleMovie.EpisodeName);
@@ -70,7 +70,7 @@ export default function TVEpisodeTable({ data, season, getListData, setIsLoading
         if (isEdit) {
             updateTVEpisode(episodeId, formData).then(res => {
                 if (res.isSuccess) {
-                    getListData(season)
+                    getListData(movie)
                     setDataEdit()
                     setIsLoading(false)
                 }
@@ -79,7 +79,7 @@ export default function TVEpisodeTable({ data, season, getListData, setIsLoading
         else {
             createTVEpisode(formData).then(res => {
                 if (res.isSuccess) {
-                    getListData(season)
+                    getListData(movie)
                     setIsLoading(false)
                 }
             })

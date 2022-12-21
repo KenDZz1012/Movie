@@ -27,6 +27,6 @@ export default class TVEpisodeCreate {
 
     @IsString()
     @IsOptional()
-    public TVSeason: string
+    public Movie: string
 }
 

@@ -19,6 +19,6 @@ export default class TVEpisodeFilter {
 
     @IsString()
     @IsOptional()
-    public TVSeason: string
+    public Movie: string
 }
 
