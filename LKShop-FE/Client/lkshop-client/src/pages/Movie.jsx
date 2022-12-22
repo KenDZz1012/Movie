@@ -4,17 +4,16 @@ import Header from '../components/Header'
 import { Breadcrumb } from '../components/movie/Breadcrumb'
 import MovieArea from '../components/movie/MovieArea'
 import Newsletter from '../components/movie/Newsletter'
-
-const Movie = () => {
+import MovieIndex from '../components/movie'
+import HeaderTwo from '../components/HeaderTwo'
+const Movie = ({ match }) => {
   return (
     <div>
-     <Header/>
-    <main>
-        <Breadcrumb/>
-        <MovieArea/>
-        <Newsletter/>
-    </main>
-     <Footer/>
+      <HeaderTwo />
+      <main>
+        <MovieIndex match={match} />
+      </main>
+      <Footer />
     </div>
   )
 }

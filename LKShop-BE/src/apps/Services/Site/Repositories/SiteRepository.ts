@@ -11,6 +11,11 @@ const getListMovieByName = async (input: MovieFilter, pageable: Pageable) => {
     console.log(pageable)
     return await MovieModel.find({ MovieName: { $regex: input.MovieName, $options: 'i' } }).limit(pageable.size).skip(pageable.skip).populate('Category').populate('Actor').populate('Director')
 }
+
+const getListMovieByCategory = async (input: MovieFilter, pageable: Pageable) => {
+    return await MovieModel.find({ "Category": { $in: input.Category } }).limit(pageable.size).skip(pageable.skip).populate("Category").populate('Actor').populate('Director')
+}
 export {
-    getListMovieByName
+    getListMovieByName, 
+    getListMovieByCategory
 }

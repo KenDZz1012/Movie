@@ -10,10 +10,14 @@ import SingleMovieUpdate from "../../SingleMovie/DTO/SingleMovieUpdate";
 import HttpException from "../../../../Exceptions/HttpException";
 import * as fs from 'fs';
 import paypal from "../../../functions/paypal";
-import { getListMovieByName } from '../Repositories/SiteRepository'
+import { getListMovieByCategory, getListMovieByName } from '../Repositories/SiteRepository'
 import Movie from "../../Movie/DTO/Movie";
 import MovieFilter from "../../Movie/DTO/MovieFilter";
 import Pageable from "../DTO/Pageable";
+import { updateClientHandler } from "../../Client/Repositories/ClientRepository";
+import ClientUpdate from "../../Client/DTO/ClientUpdate";
+import { createBillHandler } from "../../Bill/Repositories/BillRepository";
+import BillCreate from "../../Bill/DTO/BillCreate";
 const baseUrl = `api/v1/Site`
 
 export class SiteController {
@@ -24,30 +28,32 @@ export class SiteController {
     })
     private async payBundle(req: Request, res: Response, next: NextFunction) {
         const url = req.get('Host')
+        const body = req.body
+        console.log(url)
         const create_payment_json = {
             "intent": "sale",
             "payer": {
                 "payment_method": "paypal"
             },
             "redirect_urls": {
-                "return_url": "https://" + url + "/PaySuccess",
+                "return_url": "http://" + url + "/" + baseUrl + `/PaySuccess?Price=${body.Price}`,
                 "cancel_url": "/cancel"
             },
             "transactions": [{
                 "item_list": {
                     "items": [{
-                        "name": 'abc',
+                        "name": body.BundlName,
                         "sku": "001",
-                        "price": '12',
+                        "price": body.Price.toString(),
                         "currency": "USD",
                         "quantity": 1
                     }]
                 },
                 "amount": {
                     "currency": "USD",
-                    "total": '12'
+                    "total": body.Price.toString()
                 },
-                "description": "LK Convert Premium"
+                "description": "Movie"
             }]
         };
         paypal.payment.create(create_payment_json, async function (error, payment) {
@@ -55,9 +61,19 @@ export class SiteController {
                 throw error;
             } else {
                 for (let i = 0; i < payment.links.length; i++) {
+                    const dataUpdate = new ClientUpdate()
+                    dataUpdate.IsPayment = true
+                    const dataBill = new BillCreate()
+                    dataBill.Client = body.ClientId
+                    dataBill.Bundle = body.BundleId
+                    dataBill.TotalPrice = body.Price
+                    dataBill.DateBuy = new Date()
+                    dataBill.DateEnd = new Date(new Date().setMonth(new Date().getMonth() + 1))
                     if (payment.links[i].rel === 'approval_url') {
-
-                        res.redirect(payment.links[i].href);
+                        await createBillHandler(dataBill).then(async (res) => {
+                            await updateClientHandler(body.ClientId, dataUpdate, req.file)
+                        })
+                        res.send(payment.links[i].href)
                     }
                 }
 
@@ -69,19 +85,21 @@ export class SiteController {
 
     @Router({
         path: `/${baseUrl}/PaySuccess`,
-        method: 'post',
+        method: 'get',
         // middlewares: [extractJWT]
     })
     private async paySuccess(req: Request, res: Response, next: NextFunction) {
 
         const payerId = req.query.PayerID;
         const paymentId: any = req.query.paymentId;
+        const Price = req.query.Price;
+        console.log(Price)
         const execute_payment_json: any = {
             "payer_id": payerId,
             "transactions": [{
                 "amount": {
                     "currency": "USD",
-                    "total": "12"
+                    "total": Price
                 }
             }]
         };
@@ -112,6 +130,24 @@ export class SiteController {
             console.log(error)
         }
     }
+
+    @Router({
+        path: `/${baseUrl}/GetMovieByCategory`,
+        method: 'get',
+        // middlewares: [extractJWT]
+    })
+    private async getMovieByCategory(req: Request, res: Response, next: NextFunction) {
+        try {
+            const movieFilter = req.query as unknown as MovieFilter
+            const pageable = req.query as unknown as Pageable
+            const movies = await getListMovieByCategory(movieFilter, pageable);
+            return res.status(200).send(new BaseResponse<Movie[]>(movies, "Get Success", true))
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
 
     // const postPay = async (req, res) => {
     //     let today = new Date();

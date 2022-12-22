@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import $ from "jquery";
 import { useHistory } from "react-router-dom";
-
+import { getListCategory } from '../helpers/app-backend/category-backend-helper'
+import { Link } from 'react-router-dom';
 
 const HeaderTwo = () => {
   const history = useHistory()
   const [search, setSearch] = useState("")
-  useEffect(() => {
+  const [categories, setCategories] = useState([])
 
+  const fetchListCategory = async () => {
+    await getListCategory({}).then(res => {
+      setCategories(res.data)
+    })
+  }
+  useEffect(() => {
+    fetchListCategory()
 
 
 
@@ -73,7 +81,7 @@ const HeaderTwo = () => {
   }, [])
 
   const gotoSearch = () => {
-    history.push(`/search-${search}`)
+    history.push(`/search-MovieName=${search}-Page=1`)
   }
 
 
@@ -122,7 +130,13 @@ const HeaderTwo = () => {
 
                       </li>
                       <li className="menu-item-has-children"><a href="/#">Movie</a>
-
+                        <ul className="submenu" style={{ display: "flex", width: 500, flexWrap: "wrap" }}>
+                          {
+                            categories.map(item => (
+                              <li><a href={`/movie-Category=${item.CategoryName}-Page=1`}>{item.CategoryName}</a></li>
+                            ))
+                          }
+                        </ul>
                       </li>
                       <li><a href="/tv-show">tv show</a></li>
                       <li className="menu-item-has-children"><a href="/#">blog</a>

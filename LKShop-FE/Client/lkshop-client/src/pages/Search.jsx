@@ -5,10 +5,11 @@ import { Breadcrumb } from '../components/Search/Breadcrumb'
 import SearchArea from '../components/Search/MovieArea'
 import Newsletter from '../components/Search/Newsletter'
 import SearchIndex from '../components/Search'
+import HeaderTwo from '../components/HeaderTwo'
 const Search = ({ match }) => {
     return (
         <div>
-            <Header />
+            <HeaderTwo />
             <main>
                 <SearchIndex
                     match={match}

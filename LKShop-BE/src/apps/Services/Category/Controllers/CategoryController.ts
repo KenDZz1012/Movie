@@ -20,7 +20,8 @@ export class CategoryController {
         middlewares: [extractJWT, validationMiddleware(CategoryFilter)]
     })
     private async getListCategory(req: Request, res: Response, next: NextFunction) {
-        const categories = await getListCategoryHandler(req.body);
+        const cateFilter = req.query as unknown as CategoryFilter
+        const categories = await getListCategoryHandler(cateFilter);
         return res.status(200).send(new BaseResponse<Category[]>(categories, "Get Success", true))
     }
 

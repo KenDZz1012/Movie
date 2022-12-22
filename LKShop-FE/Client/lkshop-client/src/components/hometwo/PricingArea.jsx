@@ -1,19 +1,36 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react'
+import { Link, useHistory } from "react-router-dom";
 import { getListBundle } from '../../helpers/app-backend/bundle-backend-helper'
-
+import { payment } from '../../helpers/app-backend/pay-backend-helper'
 const PricingArea = () => {
+  const history = useHistory()
   const [filter, setrFilter] = useState({})
   const [listBundle, setListBundle] = useState([])
+
   const fetchListBundle = async () => {
     await getListBundle(filter).then(res => {
       setListBundle(res.data)
     })
   }
 
+  const onClickBuy = async (bundle) => {
+    const dataPay = {
+      BundleId: bundle._id,
+      BundleName: bundle.BundleName,
+      Price: bundle.Price,
+      ClientId: JSON.parse(localStorage.getItem("LKCLientInfo"))._id
+    }
+    await payment(dataPay).then(res =>
+      window.location.replace(res)
+      // console.log(res)
+    )
+  }
+
+
   useEffect(() => {
     fetchListBundle()
-  },[])
+  }, [])
 
   return (
     <section className="pricing-area pricing-bg" style={{ backgroundImage: 'url("img/bg/pricing_bg.jpg")' }}>
@@ -36,20 +53,20 @@ const PricingArea = () => {
                     <div className="pricing-top">
                       <h6>{item.BundleName}</h6>
                       <div className="price">
-                        <h3>{item.Price}</h3>
+                        <h3>{item.Price}$</h3>
                         <span>Monthly</span>
                       </div>
                     </div>
                     <div className="pricing-list">
                       <ul>
-                        <li className="quality"><i className="fas fa-check" /> Video quality <span>Good</span></li>
-                        <li><i className="fas fa-check" /> Resolution <span>480p</span></li>
-                        <li><i className="fas fa-check" /> Screens you can watch <span>1</span></li>
-                        <li><i className="fas fa-check" /> Cancel anytime</li>
+                        {item.Description.split(',').map(elem => (
+                          <li className="quality"><i className="fas fa-check" /> {elem}</li>
+
+                        ))}
                       </ul>
                     </div>
                     <div className="pricing-btn">
-                      <a href="/#" className="btn">Buy Now</a>
+                      <a onClick={() => { onClickBuy(item) }} className="btn">Buy Now</a>
                     </div>
                   </div>
                 </div>

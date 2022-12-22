@@ -1,9 +1,11 @@
 import { get, post, put, del } from '../api_helper'
+import { spreadSearchQuery } from '../utilities'
 
 const BASE_API_URL = `${process.env.REACT_APP_CATEGORY_ENDPOINT}`
 
 const getListCategory = filter => {
-    return get(`${BASE_API_URL}/GetAllCategory`, filter)
+    let q = spreadSearchQuery(filter)
+    return get(`${BASE_API_URL}/GetAllCategory/?${q}`)
 }
 
 const getCategoryById = id => {

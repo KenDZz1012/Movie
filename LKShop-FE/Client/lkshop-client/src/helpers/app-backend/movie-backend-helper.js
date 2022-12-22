@@ -15,6 +15,12 @@ const searchMovie = filter => {
     return get(`${BASE_SITE_API_URL}/GetMovieByMovieName/?${q}`)
 }
 
+const searchMovieByCategory = filter => {
+    let q = spreadSearchQuery(filter)
+    console.log(process.env.REACT_APP_SITE_ENDPOINT)
+    return get(`${BASE_SITE_API_URL}/GetMovieByCategory/?${q}`)
+}
+
 const getMovieById = id => {
     return get(`${BASE_API_URL}/GetMovieById/${id}`)
 }
@@ -36,5 +42,6 @@ export {
     createMovie,
     updateMovie,
     deleteMovie,
-    searchMovie
+    searchMovie,
+    searchMovieByCategory
 }

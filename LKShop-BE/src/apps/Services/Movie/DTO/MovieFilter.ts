@@ -8,7 +8,7 @@ export default class MovieFilter {
 
     @IsArray()
     @IsOptional()
-    public Category: Array<string>
+    public Category: string
 
     @IsArray()
     @IsOptional()

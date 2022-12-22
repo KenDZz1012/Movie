@@ -5,34 +5,35 @@ import SearchArea from './MovieArea';
 import { Breadcrumb } from './Breadcrumb';
 import Newsletter from './Newsletter';
 import { getSingleMovieById, updateSingleMovie } from '../../helpers/app-backend/singlemovie-backend-helper';
-import { getListMovie, getMovieById, searchMovie } from '../../helpers/app-backend/movie-backend-helper'
+import { getListMovie, getMovieById, searchMovie, searchMovieByCategory } from '../../helpers/app-backend/movie-backend-helper'
 import { getListTVEpisode } from '../../helpers/app-backend/tvepisode-backend-helper'
 
-export default function SearchIndex({ match }) {
-
+export default function MovieIndex({ match }) {
+    let page = match.params.page
+    let movieName = match.params.movieName
     const [singleMovie, setSingleMovie] = useState({})
     const [size, setSize] = useState(2)
     const [totalPage, setTotalPage] = useState(0)
-    const fetchSingleMovieByName = async () => {
-        await searchMovie({ MovieName: match.params.movieName, skip: 0, size: size }).then(async (res) => {
+    const fetchSingleMovieByName = async (movieName, page) => {
+        await searchMovie({ MovieName: movieName, skip: (page - 1) * size, size: size }).then(async (res) => {
             setSingleMovie(res.data)
 
         })
     }
     const fetchAll = async () => {
-        await getListMovie().then(res => {
+        await searchMovie({ MovieName: movieName }).then(res => {
             setTotalPage(Math.ceil(res.data.length / size))
         })
     }
     useEffect(() => {
         fetchAll()
-        fetchSingleMovieByName()
+        fetchSingleMovieByName(movieName, page)
     }, [])
 
     return (
         <React.Fragment>
             <Breadcrumb />
-            <SearchArea movies={singleMovie} size={size} totalPage={totalPage} />
+            <SearchArea movies={singleMovie} size={size} totalPage={totalPage} page={page} movieName={match.params.movieName} getListMovie={fetchSingleMovieByName} />
             <Newsletter />
         </React.Fragment>
     )

@@ -84,5 +84,8 @@ const MovieSchema = new mongoose.Schema({
 })
 const myDB = mongoose.connection.useDb('KenStore');
 
-const MovieModel = myDB.model<Movie>("tbl_Movie", MovieSchema);
+if (mongoose.models["tbl_Movie"] != null) {
+    mongoose.deleteModel("tbl_Movie");
+}
+const MovieModel = mongoose.model<Movie>("tbl_Movie", MovieSchema);
 export default MovieModel;

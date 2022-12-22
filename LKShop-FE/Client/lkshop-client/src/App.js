@@ -44,11 +44,10 @@ function App() {
             <HomeTwo />
           </Route> */}
 
-          <Route exact={true} path="/movie">
-            <Movie />
-          </Route>
+          <Route exact={true} path="/movie-Category=:Category-Page=:page" component={Movie} />
 
-          <Route exact={true} path="/search-:movieName" component={Search} />
+
+          <Route exact={true} path="/search-MovieName=:movieName-Page=:page" component={Search} />
 
           <Route exact={true} path="/movie-details-:movieId" component={MovieDetails} />
           {/* < />

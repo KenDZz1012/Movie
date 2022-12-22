@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import Menu from './MovieMenu';
 
-function SearchArea({ movies, size, totalPage }) {
+function SearchArea({ movies, size, totalPage, page, movieName, getListMovie }) {
   const [items, setItems] = useState(Menu);
 
   const filterItem = (categItem) => {
@@ -20,8 +20,7 @@ function SearchArea({ movies, size, totalPage }) {
         <div className="row align-items-end mb-60">
           <div className="col-lg-6">
             <div className="section-title text-center text-lg-left">
-              <span className="sub-title">ONLINE STREAMING</span>
-              <h2 className="title">New Release Movies</h2>
+              <span className="sub-title">Movie: {movieName }</span>
             </div>
           </div>
           <div className="col-lg-6">
@@ -83,7 +82,7 @@ function SearchArea({ movies, size, totalPage }) {
             <div className="pagination-wrap mt-30">
               <nav>
                 <ul>{[...Array(totalPage)].map((e, i) => {
-                  return <li><a href="/#">{i+1}</a></li>
+                  return <li className={page == i + 1 ? `active` : "  "}><Link to={`/search-MovieName=${movieName}-Page=${i + 1}`} onClick={() => { getListMovie(movieName, i + 1) }}>{i + 1}</Link></li>
                 })}
                 </ul>
               </nav>
