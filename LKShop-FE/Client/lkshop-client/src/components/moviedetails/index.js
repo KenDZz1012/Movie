@@ -5,7 +5,7 @@ import EpipsodeArea from './EpipsodeArea';
 import MovieDetail from './MovieDetail';
 import TvSeries from './TvSeries';
 import { getSingleMovieById, updateSingleMovie } from '../../helpers/app-backend/singlemovie-backend-helper';
-import { getListMovie, getMovieById } from '../../helpers/app-backend/movie-backend-helper'
+import { getListMovie, getMovieById, updateMovie } from '../../helpers/app-backend/movie-backend-helper'
 import { getListTVEpisode } from '../../helpers/app-backend/tvepisode-backend-helper'
 
 export default function MovieDetailIndex({ match }) {
@@ -19,7 +19,7 @@ export default function MovieDetailIndex({ match }) {
             // formData.append('MovieName', res.data.MovieName);
 
             formData.append('ViewCount', res.data.ViewCount + 1);
-            updateSingleMovie(res.data._id, formData)
+            await updateMovie(res.data._id, formData)
             if (res.data.Type == "TVSeries") {
                 await getListTVEpisode(res.data._id).then(response => {
                     setEpisode(response.data)

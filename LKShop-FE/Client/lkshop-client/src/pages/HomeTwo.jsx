@@ -7,12 +7,14 @@ import Footer from '../components/Footer'
 import ServiceArea from '../components/hometwo/ServiceArea'
 import TopRatedMovies2 from '../components/hometwo/TopRatedMovies2'
 import TopViewMovie from '../components/hometwo/TopViewMovie'
+import LastWatchMovie from '../components/hometwo/LastWatchMovie';
 const HomeTwo = () => {
   return (
     <>
       <HeaderTwo />
       <main>
         <SliderArea />
+        <LastWatchMovie />
         <TopRatedMovies2 />
         <GalleryArea />
         <ServiceArea />

@@ -1,33 +1,58 @@
 import React, { useEffect, useState } from 'react'
 import "magnific-popup";
 import $ from "jquery";
-
+import { getClientById, updateClient } from '../../helpers/app-backend/client-backend-helper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const EpipsodeArea = ({ singleMovie, episodes }) => {
   const [enableMovie, setEnableMovie] = useState(false)
-
+  const [movieWatched, setMovieWatched] = useState([])
+  const fetchClient = async () => {
+    let lastWatched = []
+    await getClientById(JSON.parse(localStorage.getItem("LKCLientInfo"))._id).then(res => {
+      res.data.LastWatchMovie.map(item => {
+        lastWatched.push(item._id)
+      })
+      setMovieWatched(lastWatched)
+    })
+  }
   useEffect(() => {
+    fetchClient()
     $('.popup-video').magnificPopup({
       type: 'iframe'
     });
 
 
   }, [])
-  function playVideo(index) {
-    setEnableMovie(true)
-    var elem = document.getElementsByTagName('video')[index];
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen();
-    } else {
-      alert("Full screen not supported");
-      return;
-    }
-    elem.play();
+  async function playVideo(index) {
+    await getClientById(JSON.parse(localStorage.getItem("LKCLientInfo"))._id).then(async (res) => {
+      if (res.data.IsPayment == true) {
+        setEnableMovie(true)
+        var elem = document.getElementsByTagName('video')[index];
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        } else {
+          alert("Full screen not supported");
+          return;
+        }
+        elem.play();
+        let LastWatch = movieWatched
+        LastWatch.push(singleMovie._id)
+        const formData = new FormData()
+        formData.append("LastWatchMovieString", LastWatch)
+        await updateClient(JSON.parse(localStorage.getItem("LKCLientInfo"))._id, formData)
+      }
+      else {
+        toast.error("Buy our service to watch movie");
+
+      }
+    })
   }
   return (
     <section className="episode-area episode-bg" style={{ backgroundImage: 'url("../img/bg/episode_bg.jpg")' }}>
@@ -44,6 +69,7 @@ const EpipsodeArea = ({ singleMovie, episodes }) => {
                   <p>2.7 million <i className="far fa-eye" /></p>
                 </div>
               </div>
+              <ToastContainer />
               <div className="episode-watch-wrap">
                 <div className="accordion" id="accordionExample">
                   <div className="card">

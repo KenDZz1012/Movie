@@ -26,11 +26,11 @@ const getMovieById = id => {
 }
 
 const createMovie = userCreate => {
-    return post(`${BASE_API_URL}/CreateMovie`, userCreate)
+    return postWithFormData(`${BASE_API_URL}/CreateMovie`, userCreate)
 }
 
 const updateMovie = (UserId, userUpdate) => {
-    return put(`${BASE_API_URL}/UpdateMovie/${UserId}`, userUpdate)
+    return putWithFormData(`${BASE_API_URL}/UpdateMovie/${UserId}`, userUpdate)
 }
 
 const deleteMovie = id => {

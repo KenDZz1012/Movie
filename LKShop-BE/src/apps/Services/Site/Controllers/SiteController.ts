@@ -18,6 +18,9 @@ import { updateClientHandler } from "../../Client/Repositories/ClientRepository"
 import ClientUpdate from "../../Client/DTO/ClientUpdate";
 import { createBillHandler } from "../../Bill/Repositories/BillRepository";
 import BillCreate from "../../Bill/DTO/BillCreate";
+import ejs from 'ejs'
+import path from "path";
+import transporter from '../../../../common/transporter'
 const baseUrl = `api/v1/Site`
 
 export class SiteController {
@@ -36,7 +39,7 @@ export class SiteController {
                 "payment_method": "paypal"
             },
             "redirect_urls": {
-                "return_url": "http://" + url + "/" + baseUrl + `/PaySuccess?Price=${body.Price}`,
+                "return_url": "http://" + url + "/" + baseUrl + `/PaySuccess?Price=${body.Price}&ClientId=${body.ClientId}&Email=${body.Email}&Bundle=${body.BundleName}`,
                 "cancel_url": "/cancel"
             },
             "transactions": [{
@@ -73,8 +76,10 @@ export class SiteController {
                         await createBillHandler(dataBill).then(async (res) => {
                             await updateClientHandler(body.ClientId, dataUpdate, req.file)
                         })
+
                         res.send(payment.links[i].href)
                     }
+
                 }
 
             }
@@ -93,6 +98,9 @@ export class SiteController {
         const payerId = req.query.PayerID;
         const paymentId: any = req.query.paymentId;
         const Price = req.query.Price;
+        const ClientId = req.query.ClientId || ""
+        const Email = req.query.Email || ""
+        const Bundle = req.query.Bundle || ""
         console.log(Price)
         const execute_payment_json: any = {
             "payer_id": payerId,
@@ -103,12 +111,27 @@ export class SiteController {
                 }
             }]
         };
-        paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+        paypal.payment.execute(paymentId, execute_payment_json, async function (error, payment) {
             if (error) {
                 console.log(error.response);
                 throw error;
             } else {
-                res.send('OK')
+                const html = await ejs.renderFile('src/viewEmail/mail.ejs',
+                    {
+                        username: ClientId,
+                        email: Email,
+                        price: Price,
+                        name: Bundle,
+                    }
+                );
+                const options = {
+                    from: "Movie LK",
+                    to: Email.toString(),
+                    subject: "Xác nhận đơn hàng từ LK Movie",
+                    html,
+                }
+                transporter.sendMail(options)
+                res.redirect('http://localhost:3000/')
             }
         });
     }

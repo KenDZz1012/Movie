@@ -175,6 +175,7 @@ import Bundle from "LKAdminPage/Bundle/index";
 import Movie from "LKAdminPage/Movie/index"
 import SingleMovie from "LKAdminPage/SingleMovie";
 import TVSeries from "LKAdminPage/TVSeries";
+import Bill from "LKAdminPage/Bill";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -186,6 +187,7 @@ const authProtectedRoutes = [
   { path: "/Movie", component: Movie },
   { path: "/SingleMovie", component: SingleMovie },
   { path: "/TVSeries", component: TVSeries },
+  { path: "/Bill", component: Bill },
 
   //Crypto
   { path: "/crypto-wallet", component: CryptoWallet },

@@ -28,7 +28,11 @@ export default class ClientUpdate {
 
     @IsArray()
     @IsOptional()
-    public LastWatch: Array<string>
+    public LastWatchMovie: Array<string>
+
+    @IsString()
+    @IsOptional()
+    public LastWatchMovieString: string
 
     @IsArray()
     @IsOptional()

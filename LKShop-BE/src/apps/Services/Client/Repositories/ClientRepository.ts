@@ -44,7 +44,9 @@ const updateClientHandler = async (ClientId: String, input: ClientUpdate, file: 
         const filePath = await _fileService.createFile(file)
         input.Avatar = filePath
     }
-    console.log(ClientId, input)
+    if (input.LastWatchMovieString) {
+        input.LastWatchMovie = input.LastWatchMovieString.split(',')
+    }
     return await ClientModel.updateOne({ _id: ClientId }, { $set: input })
 }
 

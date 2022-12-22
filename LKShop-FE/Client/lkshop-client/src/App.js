@@ -11,6 +11,8 @@ import Blogs from './pages/Blogs';
 import BlogDetails from './pages/BlogDetails';
 import ContactPage from './pages/ContactPage';
 import SigninPage from './pages/SignIn'
+import SignupPage from './pages/SignUp'
+
 import Search from './pages/Search'
 function App() {
 
@@ -30,7 +32,9 @@ function App() {
       <Router>
 
         <Switch>
-
+          <Route exact={true} path="/SignUp">
+            <SignupPage />
+          </Route>
           <Route exact={true} path="/SignIn">
             <SigninPage />
           </Route>

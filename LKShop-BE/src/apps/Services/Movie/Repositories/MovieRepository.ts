@@ -6,6 +6,7 @@ import MovieUpdate from "../DTO/MovieUpdate";
 import { FileService } from "../../../middlewares/FileService";
 import Pageable from "../DTO/Pageable";
 const _fileService = new FileService();
+import mongoose from "mongoose";
 
 const getAllMovieHandler = async (input: MovieFilter, pageable: Pageable) => {
     return await MovieModel.find(input).sort(pageable.sort).limit(pageable.size).populate('Category').populate('Actor').populate('Director')
@@ -40,23 +41,34 @@ const createMovieHandler = async (input: MovieCreate, files: any) => {
 }
 
 const updateMovieHandler = async (MovieId: String, input: MovieUpdate, files: any) => {
+    if (files) {
+        if (files.MoviePoster) {
+            const filePathPoster = await _fileService.createFile(files.MoviePoster[0])
+            input.Poster = filePathPoster
+        }
+        if (files.MovieCoverPoster) {
+            const filePathPoster = await _fileService.createFile(files.MovieCoverPoster[0])
+            input.CoverPoster = filePathPoster
+        }
+        if (files.MovieVideo) {
 
-    if (files.MoviePoster) {
-        const filePathPoster = await _fileService.createFile(files.MoviePoster[0])
-        input.Poster = filePathPoster
+            input.Video = `MovieVideo/${input.MovieName}-${input.YearProduce}.mp4`
+        }
     }
-    if (files.MovieCoverPoster) {
-        const filePathPoster = await _fileService.createFile(files.MovieCoverPoster[0])
-        input.CoverPoster = filePathPoster
-    }
-    if (files.MovieVideo) {
+    if (input.Actor) {
+        input.Actor = JSON.parse(input.Actor)
 
-        input.Video = `MovieVideo/${input.MovieName}-${input.YearProduce}.mp4`
     }
-    input.Actor = JSON.parse(input.Actor)
-    input.Director = JSON.parse(input.Director)
-    input.Category = JSON.parse(input.Category)
-    return await MovieModel.updateOne({ _id: MovieId }, { $set: input })
+    if (input.Director) {
+        input.Director = JSON.parse(input.Director)
+
+    }
+    if (input.Category) {
+        input.Category = JSON.parse(input.Category)
+
+    }
+    
+    return await MovieModel.findByIdAndUpdate(MovieId, { $set: input })
 }
 
 const deleteMovieHandler = async (input: string) => {

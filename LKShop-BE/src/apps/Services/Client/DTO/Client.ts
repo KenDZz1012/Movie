@@ -6,7 +6,7 @@ export default class Client {
     public Avatar: string
     public IsPayment: Boolean
     public Quality: string
-    public LastWatch: Array<string>
+    public LastWatchMovie: Array<string>
     public MovieList: Array<string>
     public Bundle: string
 }

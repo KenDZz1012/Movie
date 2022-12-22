@@ -19,7 +19,8 @@ const PricingArea = () => {
       BundleId: bundle._id,
       BundleName: bundle.BundleName,
       Price: bundle.Price,
-      ClientId: JSON.parse(localStorage.getItem("LKCLientInfo"))._id
+      ClientId: JSON.parse(localStorage.getItem("LKCLientInfo"))._id,
+      Email:  JSON.parse(localStorage.getItem("LKCLientInfo")).Email
     }
     await payment(dataPay).then(res =>
       window.location.replace(res)

@@ -3,12 +3,12 @@ import Bill from "../DTO/Bill";
 
 const BillSchema = new mongoose.Schema({
     Client: {
-        type: String,
-        require: true
+        type: mongoose.Types.ObjectId,
+        ref: "tbl_Client"
     },
     Bundle: {
-        type: String,
-        default: null
+        type: mongoose.Types.ObjectId,
+        ref: "tbl_Bundle"
     },
     TotalPrice: {
         type: Number,

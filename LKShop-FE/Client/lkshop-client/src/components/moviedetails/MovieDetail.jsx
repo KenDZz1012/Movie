@@ -3,13 +3,31 @@ import $ from "jquery";
 import "magnific-popup"
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import ReactPlayer from 'react-player'
-
+import { getClientById, updateClient } from '../../helpers/app-backend/client-backend-helper';
+import { Rating } from 'react-simple-star-rating'
+import BeautyStars from 'beauty-stars';
+import { updateMovie } from '../../helpers/app-backend/movie-backend-helper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const MovieDetail = ({ singleMovie }) => {
   const [enableMovie, setEnableMovie] = useState(false)
   const vidRef = useRef(null);
+  const [client, setClient] = useState({})
+  const [movieWatched, setMovieWatched] = useState([])
+  const [rating, setRating] = useState(0)
 
-
+  const fetchClient = async () => {
+    let lastWatched = []
+    await getClientById(JSON.parse(localStorage.getItem("LKCLientInfo"))._id).then(res => {
+      res.data.LastWatchMovie.map(item => {
+        lastWatched.push(item._id)
+      })
+      setMovieWatched(lastWatched)
+    })
+  }
   useEffect(() => {
+    fetchClient()
+    setRating(singleMovie?.Rating)
     $('.popup-video').magnificPopup({
       type: 'iframe'
     });
@@ -24,22 +42,44 @@ const MovieDetail = ({ singleMovie }) => {
     }
   })
 
-  function playVideo() {
-    setEnableMovie(true)
-    var elem = document.getElementsByTagName('video')[0];
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen();
-    } else {
-      alert("Full screen not supported");
-      return;
-    }
-    elem.play();
+  async function playVideo() {
+    await getClientById(JSON.parse(localStorage.getItem("LKCLientInfo"))._id).then(async (res) => {
+      if (res.data.IsPayment == true) {
+        setEnableMovie(true)
+        var elem = document.getElementsByTagName('video')[0];
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        } else {
+          alert("Full screen not supported");
+          return;
+        }
+        elem.play();
+        let LastWatch = movieWatched
+        LastWatch.push(singleMovie._id)
+        const formData = new FormData()
+        formData.append("LastWatchMovieString", LastWatch)
+        await updateClient(JSON.parse(localStorage.getItem("LKCLientInfo"))._id, formData)
+      }
+      else {
+        toast.error("Buy our service to watch movie");
+
+      }
+    })
+
+  }
+  const handleRating = async (rate) => {
+    const formData = new FormData()
+    const rating = Math.round((rate + singleMovie?.Rating) / 2)
+    formData.append("Rating", rating)
+    formData.append("RateCount", singleMovie?.RateCount + 1)
+    await updateMovie(singleMovie?._id, formData)
+    // Some logic
   }
   return (
     <section className="movie-details-area" style={{ backgroundImage: 'url("../img/bg/movie_details_bg.jpg")' }}>
@@ -51,6 +91,7 @@ const MovieDetail = ({ singleMovie }) => {
               <a onClick={playVideo} className="popup-video"><img src="img/images/play_icon.png" alt="" /></a>
             </div>
           </div>
+          <ToastContainer/>
           <div className="col-xl-6 col-lg-8">
             <div className="movie-details-content">
               <h2>{singleMovie?.MovieName}</h2>
@@ -60,6 +101,21 @@ const MovieDetail = ({ singleMovie }) => {
                   <li className="quality">
                     <span>Pg 18</span>
                     <span>hd</span>
+                    <Rating
+                      onClick={handleRating}
+                      initialValue={singleMovie?.Rating}
+                      size={20}
+                      label
+                      transition
+                      fillColor='orange'
+                      emptyColor='gray'
+                      className='foo'
+                    // Will remove the inline style if applied
+                    />
+                    {/* <BeautyStars
+                      value={rating}
+                      // onChange={value => this.setState({ value })}
+                    /> */}
                   </li>
                   <li className="category">
                     {singleMovie?.Category?.length > 0 ?

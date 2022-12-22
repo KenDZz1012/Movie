@@ -23,5 +23,8 @@ const ClientSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 const myDB = mongoose.connection.useDb('KenStore');
-const ClientModel = myDB.model<Client>("tbl_Client", ClientSchema);
+if (mongoose.models["tbl_Client"] != null) {
+    mongoose.deleteModel("tbl_Client");
+}
+const ClientModel = mongoose.model<Client>("tbl_Client", ClientSchema);
 export default ClientModel;
