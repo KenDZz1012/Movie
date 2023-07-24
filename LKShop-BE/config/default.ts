@@ -22,7 +22,7 @@ export default {
         secure: false,
         auth: {
             user: "kienteo1012@gmail.com",
-            pass: "feukpqumpzthjsee",
+            pass: "voiatmrrsdwrzrnm",
         }
     },
 }

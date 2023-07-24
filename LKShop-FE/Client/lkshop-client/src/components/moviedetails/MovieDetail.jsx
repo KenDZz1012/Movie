@@ -61,7 +61,10 @@ const MovieDetail = ({ singleMovie }) => {
         }
         elem.play();
         let LastWatch = movieWatched
-        LastWatch.push(singleMovie._id)
+        if (!LastWatch.includes(singleMovie._id))
+        {
+          LastWatch.push(singleMovie._id)
+        }
         const formData = new FormData()
         formData.append("LastWatchMovieString", LastWatch)
         await updateClient(JSON.parse(localStorage.getItem("LKCLientInfo"))._id, formData)
@@ -91,7 +94,7 @@ const MovieDetail = ({ singleMovie }) => {
               <a onClick={playVideo} className="popup-video"><img src="img/images/play_icon.png" alt="" /></a>
             </div>
           </div>
-          <ToastContainer/>
+          <ToastContainer />
           <div className="col-xl-6 col-lg-8">
             <div className="movie-details-content">
               <h2>{singleMovie?.MovieName}</h2>

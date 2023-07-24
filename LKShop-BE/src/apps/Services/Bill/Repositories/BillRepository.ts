@@ -5,7 +5,7 @@ import BillUpdate from "../DTO/BillUpdate";
 import BillModel from "../Models/BillModel";
 
 const getListBillHandler = async (input: BillFilter) => {
-    return await BillModel.find(input).populate("Client").populate("Bundle")
+    return await BillModel.find(input).sort("-DateBuy").populate("Client").populate("Bundle")
 }
 
 const getBillByIdHandler = async (input: String) => {

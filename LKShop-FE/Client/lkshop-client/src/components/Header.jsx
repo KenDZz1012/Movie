@@ -113,18 +113,10 @@ const Header = () => {
                   <div className="header-action d-none d-md-block">
                     <ul>
                       <li className="header-search"><a href="/#" data-toggle="modal" data-target="#search-modal"><i className="fas fa-search" /></a></li>
-                      <li className="header-lang">
-                        <form action="/#">
-                          <div className="icon"><i className="flaticon-globe" /></div>
-                          <select id="lang-dropdown">
-                            <option value>En</option>
-                            <option value>Au</option>
-                            <option value>AR</option>
-                            <option value>TU</option>
-                          </select>
-                        </form>
-                      </li>
-                      {!localStorage.getItem("LKAuthClient") ? <li className="header-btn"><a href="/#" className="btn">Sign In</a></li> : <></>}
+                     <div>
+                      SignIn
+                     </div>
+                      {!localStorage.getItem("LKAuthClient") ? <li className="header-btn"><a href="/#" className="btn">Sign In</a></li> : <>LogOut</>}
                     </ul>
                   </div>
                 </nav>

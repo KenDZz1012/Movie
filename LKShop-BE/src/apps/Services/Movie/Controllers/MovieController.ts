@@ -12,20 +12,20 @@ import MovieUpdate from "../DTO/MovieUpdate";
 import HttpException from "../../../../Exceptions/HttpException";
 import * as fs from 'fs';
 import Pageable from "../DTO/Pageable";
-
+import CheckDateBuy from "../../../middlewares/CheckDateBuy";
 const baseUrl = "api/v1/Movie"
 
 export class MovieController {
     @Router({
         path: `/${baseUrl}/GetAllMovie`,
         method: 'get',
-        middlewares: [extractJWT, validationMiddleware(MovieFilter)]
+        middlewares: [extractJWT, validationMiddleware(MovieFilter), CheckDateBuy]
     })
     private async GetAllMovie(req: Request, res: Response, next: NextFunction) {
         try {
             const filter = req.query as unknown as MovieFilter
             const pageable = req.query as unknown as Pageable
-            const movies = await getAllMovieHandler(filter,pageable);
+            const movies = await getAllMovieHandler(filter, pageable);
             return res.status(200).send(new BaseResponse<Movie[]>(movies, "Get Success", true))
         }
         catch (error) {
@@ -55,44 +55,36 @@ export class MovieController {
         method: 'get',
     })
     private async GetVideoByMovie(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { Folder, Movie, YearProduce } = req.params
-            const path = `src/public/${Folder}/${Movie}-${YearProduce}.mp4`;
-            console.log(path)
-            const stat = fs.statSync(path);
-            console.log(stat)
-            const fileSize = stat.size;
-            const range = req.headers.range;
-            if (range) {
-                const parts = range.replace(/bytes=/, "").split("-");
-                const start = parseInt(parts[0], 10);
-                const end = parts[1]
-                    ? parseInt(parts[1], 10)
-                    : fileSize - 1;
-                const chunksize = (end - start) + 1;
-                const file = fs.createReadStream(path, { start, end });
-                const head = {
-                    'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                    'Accept-Ranges': 'bytes',
-                    'Content-Length': chunksize,
-                    'Content-Type': 'video/mp4',
-                };
-                console.log(path)
-                res.writeHead(206, head);
-                file.pipe(res);
-            } else {
-                const head = {
-                    'Content-Length': fileSize,
-                    'Content-Type': 'video/mp4',
-                };
-                console.log('path', path)
-                res.writeHead(200, head);
-                fs.createReadStream(path).pipe(res);
-            }
-        }
-        catch (error) {
-            console.log(error)
-        }
+       
+        const range = req.headers.range;
+        if (!range) res.status(400).send("Range must be provided");
+
+        const { Folder, Movie, YearProduce } = req.params
+        const videoPath = `src/public/${Folder}/${Movie}-${YearProduce}.mp4`;
+        // extract video size by using statSyn()
+        const videoSize = fs.statSync(videoPath).size;
+        // 10 powered by 6 equal 1000000bytes = 1mb
+        const chunkSize = 10 ** 6;
+
+        // calculating video where to start and where to end.
+        const start = Number(range.replace(/\D/g, ""));
+        const end = Math.min(start + chunkSize, videoSize - 1);
+        const contentLength = end - start + 1;
+
+        // setup video headers
+        const headers = {
+            "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": contentLength,
+            "Content-Type": "video/mp4",
+        };
+
+        res.writeHead(206, headers);
+        // creating readStream (stdin).
+        const videoStream = fs.createReadStream(videoPath, { start, end });
+
+        // create live stream pipe line
+        videoStream.pipe(res);
     }
 
     @Router({

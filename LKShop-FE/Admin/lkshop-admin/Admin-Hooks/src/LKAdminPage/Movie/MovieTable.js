@@ -75,7 +75,7 @@ const MovieTable = () => {
     const [activeTab1, setactiveTab1] = useState("1");
     const [listEpisode, setListEpisode] = useState([])
     const [isLoading, setIsloading] = useState(false)
-    const [movieId,setMovieId] = useState()
+    const [movieId, setMovieId] = useState()
     const optionType = [
         {
             label: "Phim lẻ",
@@ -412,7 +412,7 @@ const MovieTable = () => {
             createMovie(formData).then(res => {
                 if (res.isSuccess) {
                     getListDataHandler()
-                    if(type=="SingleMovie"){
+                    if (type == "SingleMovie") {
                         setModal(false)
                     }
                     setMovieId(res.data)
@@ -489,7 +489,7 @@ const MovieTable = () => {
                                                         Season
                                                     </NavLink>
                                                 </NavItem>
-                                                {type == "TVSeries" ?
+                                                {type == "TVSeries" || dataEdit?.Type == "TVSeries" ?
                                                     <NavItem>
                                                         <NavLink
                                                             style={{ cursor: "pointer" }}
@@ -584,7 +584,7 @@ const MovieTable = () => {
                                                                                 }
                                                                                 onChange={getType}
                                                                                 options={optionType}
-                                                                                // isDisabled={isEdit}
+                                                                            // isDisabled={isEdit}
                                                                             />
                                                                         </div>
                                                                     </Col>

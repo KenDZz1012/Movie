@@ -10,7 +10,7 @@ const TopRatedMovies2 = () => {
 
   const [newMovie, setNewMovie] = useState([])
   const getListNewSingleMovie = async () => {
-    await getListMovie({ size: 10, sort: "-CreatedTime", Status: "Done" }).then(res => {
+    await getListMovie({ size: 10, sort: "-CreatedTime", Status: "Done", ClientId: JSON.parse(localStorage.getItem("LKCLientInfo"))._id }).then(res => {
       if (res?.isSuccess) {
         setNewMovie(res.data)
         $('.popup-video').magnificPopup({
@@ -83,7 +83,7 @@ const TopRatedMovies2 = () => {
             </div>
           ))}
 
-        
+
 
         </div>
       </div>
