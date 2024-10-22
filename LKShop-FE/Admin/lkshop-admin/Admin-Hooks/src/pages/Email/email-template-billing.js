@@ -28,7 +28,6 @@ const EmailTemplateBilling = props => {
                   backgroundColor: "transparent",
                   margin: "0",
                 }}
-                bgcolor="#f6f6f6"
               >
                 <tbody>
                   <tr
@@ -118,7 +117,6 @@ const EmailTemplateBilling = props => {
                                   borderRadius: "7px",
                                   backgroundColor: "#fff",
                                 }}
-                                align="center"
                                 valign="top"
                               >
                                 <table
@@ -169,7 +167,6 @@ const EmailTemplateBilling = props => {
                                             textAlign: "center",
                                             margin: "40px 0 0",
                                           }}
-                                          align="center"
                                         >
                                           Thanks for using{" "}
                                           <b style={{ fontWeight: "600" }}>

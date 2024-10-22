@@ -172,9 +172,7 @@ const MovieDetail = ({ singleMovie }) => {
               </div>
             </div>
           </div>
-          <div className="movie-details-btn">
-            <a href="/img/poster/movie_details_img.jpg" className="download-btn" download>Download <img src="fonts/download.svg" alt="" /></a>
-          </div>
+       
           {
             singleMovie.Type == "SingleMovie" ?
               <video height={0} ref={vidRef} controls={false} mute={enableMovie} autoPlay={enableMovie} src={`http://localhost:8000/api/v1/Movie/GetVideo/Folder=MovieVideo&Movie=${singleMovie?.MovieName}&YearProduce=${singleMovie?.YearProduce}`} width="400">
@@ -184,7 +182,7 @@ const MovieDetail = ({ singleMovie }) => {
           {/* <ReactPlayer
             config={{ file: { attributes: { controlsList: 'nosize' } } }}
 
-            url={`http://localhost:8000/api/v1/SingleMovie/GetVideo/Folder=MovieVideo&Movie=${singleMovie?.Movie?._id}&YearProduce=${singleMovie?.YearProduce}`}
+            url={`http://localhost:8000/api/v1/Movie/GetVideo/Folder=MovieVideo&Movie=${singleMovie?.MovieName}&YearProduce=${singleMovie?.YearProduce}`}
             width="100%"
             height="100%"
             controls

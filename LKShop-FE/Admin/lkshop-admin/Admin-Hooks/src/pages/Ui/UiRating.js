@@ -6,7 +6,6 @@ import { Row, Col, Card, CardBody, Container } from "reactstrap";
 
 // Rating Plugin
 import Rating from "react-rating";
-import RatingTooltip from "react-rating-tooltip";
 
 const UiRating = () => {
 
@@ -53,24 +52,7 @@ const UiRating = () => {
                     <Col xl="3" md="4" sm="6">
                       <div className="p-4 text-center">
                         <h5 className="font-16 m-b-15">Default rating</h5>
-                        <RatingTooltip
-                          max={5}
-                          onChange={rate => {
-                            setdef(rate);
-                          }}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />{" "}
+                        
                         <span>{def}</span>
                       </div>
                     </Col>
@@ -78,24 +60,7 @@ const UiRating = () => {
                     <Col xl="3" md="4" sm="6">
                       <div className="p-4 text-center">
                         <h5 className="font-size-15 mb-3">Half rating</h5>
-                        <RatingTooltip
-                          max={5}
-                          onChange={rate => {
-                            setRate(rate);
-                          }}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-primary"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                       
                       </div>
                     </Col>
 
@@ -149,24 +114,7 @@ const UiRating = () => {
                         <h5 className="font-16 m-b-15">
                           Customized heart rating
                         </h5>
-                        <RatingTooltip
-                          max={5}
-                          onChange={rate => {
-                            setcustomize(rate);
-                          }}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-heart text-danger"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-heart-outline text-danger"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                        
                         <span>{customize}</span>
                       </div>
                     </Col>
@@ -195,49 +143,14 @@ const UiRating = () => {
                     <Col xl="3" md="4" sm="6">
                       <div className="p-4 text-center">
                         <h5 className="font-16 m-b-15">Customize tooltips</h5>
-                        <RatingTooltip
-                          max={5}
-                          clearRating={false}
-                          onChange={rate => {
-                            setdef(rate);
-                          }}
-                          tooltipContent={tooltipContent}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                       
                       </div>
                     </Col>
 
                     <Col xl="3" md="4" sm="6">
                       <div className="p-4 text-center">
                         <h5 className="font-16 m-b-15">Default rating</h5>
-                        <RatingTooltip
-                          max={8}
-                          clearRating={false}
-                          tooltipContent={tooltipContentMore}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                       
                       </div>
                     </Col>
 
@@ -246,26 +159,7 @@ const UiRating = () => {
                         <h5 className="font-16 m-b-15">
                           Set start rate to 5 [6..10]
                         </h5>
-                        <RatingTooltip
-                          max={5}
-                          clearRating={false}
-                          onChange={() => {
-                            setStartrate(!startrate);
-                          }}
-                          tooltipContent={tooltipContentHalf}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                        
                       </div>
                     </Col>
 
@@ -274,27 +168,7 @@ const UiRating = () => {
                         <h5 className="font-16 m-b-15">
                           Set start and stop rate [2..10]
                         </h5>
-                        <RatingTooltip
-                          max={11}
-                          onChange={() => {
-                            setSecondRate(!secondrate);
-                          }}
-                          clearRating={false}
-                          tooltipContent={tooltipContentMiddle}
-                          defaultRating={4}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                        
                       </div>
                     </Col>
 
@@ -303,26 +177,7 @@ const UiRating = () => {
                         <h5 className="font-16 m-b-15">
                           Set start and stop rate [2..10]
                         </h5>
-                        <RatingTooltip
-                          max={5}
-                          clearRating={false}
-                          onChange={() => {
-                            setStopRate(!stopRate);
-                          }}
-                          tooltipContent={tooltipContentStep}
-                          ActiveComponent={
-                            <i
-                              className="mdi mdi-star text-primary"
-                              style={starStyle}
-                            />
-                          }
-                          InActiveComponent={
-                            <i
-                              className="mdi mdi-star-outline text-muted"
-                              style={starStyle}
-                            />
-                          }
-                        />
+                       
                       </div>
                     </Col>
 

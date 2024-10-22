@@ -25,7 +25,6 @@ const EmailBasicTemplte = () => {
                   width: "100%",
                   backgroundColor: "transparent",
                 }}
-                bgcolor="#f6f6f6"
               >
                 <tbody>
                   <tr

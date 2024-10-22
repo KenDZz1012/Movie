@@ -1186,7 +1186,6 @@ const FormAdvanced = () => {
                             <input
                               type="checkbox"
                               id="square-switch1"
-                              switch="none"
                               checked={sq1}
                               onChange={() => {
                                 setsq1(!sq1);
@@ -1202,7 +1201,6 @@ const FormAdvanced = () => {
                             <input
                               type="checkbox"
                               id="square-switch2"
-                              switch="info"
                               checked={sq2}
                               onChange={() => {
                                 setsq2(!sq2);
@@ -1218,7 +1216,6 @@ const FormAdvanced = () => {
                             <input
                               type="checkbox"
                               id="square-switch3"
-                              switch="bool"
                               checked={sq3}
                               onChange={() => {
                                 setsq3(!sq3);

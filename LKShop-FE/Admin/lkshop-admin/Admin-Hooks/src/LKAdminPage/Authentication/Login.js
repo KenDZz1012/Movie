@@ -43,11 +43,14 @@ const Login = props => {
 
   const login = async () => {
     await adminLogin(loginInfo).then(res => {
-      if (res.isSuccess) {
-        localStorage.setItem("LKAuthUser", res.token)
-        localStorage.setItem("LKUserInfo", JSON.stringify(res.data))
-        history.push("/dashboard")
+      if(res){
+        if (res.isSuccess) {
+          localStorage.setItem("LKAuthUser", res.token)
+          localStorage.setItem("LKUserInfo", JSON.stringify(res.data))
+          history.push("/dashboard")
+        }
       }
+     
       else {
       }
     })

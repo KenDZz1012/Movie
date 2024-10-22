@@ -9,7 +9,7 @@ const ClientLoginHandler = async (input: ClientLogin) => {
         if (!client) {
             return {
                 isSuccess: false,
-                msgString: "Not exist Email"
+                msgString: "Email không tồn tại"
             }
         }
         console.log(Password,client.Password)
@@ -17,7 +17,7 @@ const ClientLoginHandler = async (input: ClientLogin) => {
         if (!isPasswordValid) {
             return {
                 isSuccess: false,
-                msgString: "Wrong password"
+                msgString: "Sai mật kh"
             }
         }
         client = client.toObject()

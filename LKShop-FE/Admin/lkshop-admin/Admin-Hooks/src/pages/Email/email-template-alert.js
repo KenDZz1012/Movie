@@ -26,7 +26,6 @@ const EmailAlertTemplte = props => {
                   backgroundColor: "#f6f6f6",
                   margin: "0",
                 }}
-                bgcolor="#f6f6f6"
               >
                 <tbody>
                   <tr

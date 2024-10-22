@@ -11,14 +11,14 @@ const UserLoginHandler = async (input: UserLogin) => {
         if (!user) {
             return {
                 isSuccess: false,
-                msgString: "Not exist UserName"
+                msgString: "Tài khoản không tồn tại"
             }
         }
         const isPasswordValid: boolean = await bcrypt.compare(Password, user.Password);
         if (!isPasswordValid) {
             return {
                 isSuccess: false,
-                msgString: "Wrong password"
+                msgString: "Sai mật khẩu"
             }
         }
         user = user.toObject()

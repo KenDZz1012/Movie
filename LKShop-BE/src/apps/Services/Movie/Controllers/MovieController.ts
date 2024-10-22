@@ -55,36 +55,42 @@ export class MovieController {
         method: 'get',
     })
     private async GetVideoByMovie(req: Request, res: Response, next: NextFunction) {
-       
-        const range = req.headers.range;
-        if (!range) res.status(400).send("Range must be provided");
-
-        const { Folder, Movie, YearProduce } = req.params
+        const { Folder, Movie, YearProduce } = req.params;
         const videoPath = `src/public/${Folder}/${Movie}-${YearProduce}.mp4`;
-        // extract video size by using statSyn()
-        const videoSize = fs.statSync(videoPath).size;
-        // 10 powered by 6 equal 1000000bytes = 1mb
-        const chunkSize = 10 ** 6;
-
-        // calculating video where to start and where to end.
-        const start = Number(range.replace(/\D/g, ""));
-        const end = Math.min(start + chunkSize, videoSize - 1);
-        const contentLength = end - start + 1;
-
-        // setup video headers
-        const headers = {
-            "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-            "Accept-Ranges": "bytes",
-            "Content-Length": contentLength,
-            "Content-Type": "video/mp4",
-        };
-
-        res.writeHead(206, headers);
-        // creating readStream (stdin).
-        const videoStream = fs.createReadStream(videoPath, { start, end });
-
-        // create live stream pipe line
-        videoStream.pipe(res);
+        const stat = fs.statSync(videoPath);
+        const videoSize = stat.size;
+        const range = req.headers.range;
+        if (!range){
+                res.writeHead(200, {
+                  'Content-Length': videoSize,
+                  'Content-Type': 'video/mp4',
+                });
+                fs.createReadStream(videoPath).pipe(res);
+              
+        }
+        else{
+            const chunkSize = 10 ** 6;  // 1MB chunk size
+            const parts = range.replace(/bytes=/, '').split('-');
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : videoSize - 1;
+            if (start >= videoSize || end >= videoSize) {
+                res.writeHead(416, {
+                    'Content-Range': `bytes */${videoSize}`
+                });
+                return res.end();
+            }
+            res.writeHead(206, {
+                'Content-Range': `bytes ${start}-${end}/${videoSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': end - start + 1,
+                'Content-Type': 'video/mp4',
+            });
+              
+            const stream = fs.createReadStream(videoPath, { start, end });
+            stream.pipe(res);
+        }
+        
+        
     }
 
     @Router({
